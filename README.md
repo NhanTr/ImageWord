@@ -23,6 +23,20 @@ Truy cập:
 
 Muốn thay đổi credential hoặc port, sao chép `.env.example` thành `.env` và thay giá trị trước khi chạy.
 
+Nếu hostname/public port của MinIO khác `http://localhost:9000`, đặt `MINIO_PUBLIC_ENDPOINT` thành URL mà trình duyệt người dùng truy cập được. Backend dùng giá trị này để tạo presigned URL.
+
+## API ảnh
+
+```text
+POST   /api/v1/images          multipart field: file
+GET    /api/v1/images          cursor pagination và filter
+GET    /api/v1/images/:id      metadata thuộc user hiện tại
+GET    /api/v1/images/:id/url  presigned download/preview URL
+DELETE /api/v1/images/:id      xóa ảnh và các kết quả liên quan
+```
+
+Tất cả endpoint ảnh yêu cầu `Authorization: Bearer <access-token>`.
+
 ## Kiểm tra source code
 
 ```bash

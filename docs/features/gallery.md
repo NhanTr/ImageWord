@@ -1,6 +1,6 @@
 # Tính năng: Thư viện ảnh người dùng
 
-Trạng thái: `CHỜ DUYỆT`
+Trạng thái: `BACKEND HOÀN THÀNH MỐC 4; FRONTEND CHỜ MỐC 6`
 
 ## Phạm vi
 

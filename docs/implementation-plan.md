@@ -26,7 +26,7 @@ Trạng thái: `HOÀN THÀNH` — người dùng xác nhận ngày 2026-08-12.
 
 ## Mốc 3 — Database và authentication
 
-Trạng thái: `HOÀN THÀNH` — chờ người dùng nghiệm thu để chuyển sang Mốc 4.
+Trạng thái: `HOÀN THÀNH` — người dùng xác nhận ngày 2026-08-12.
 
 - Tạo migration/schema cho `users`, `images` và enum.
 - API đăng ký, đăng nhập, refresh, đăng xuất, lấy profile.
@@ -35,7 +35,7 @@ Trạng thái: `HOÀN THÀNH` — chờ người dùng nghiệm thu để chuy�
 
 ## Mốc 4 — Upload và quản lý file MinIO
 
-Trạng thái: `CHỜ DUYỆT`.
+Trạng thái: `HOÀN THÀNH` — chờ người dùng nghiệm thu để chuyển sang Mốc 5.
 
 - Upload có validation kích thước, MIME và magic bytes.
 - Lưu object private trong MinIO và metadata PostgreSQL.

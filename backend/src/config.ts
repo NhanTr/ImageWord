@@ -61,6 +61,7 @@ export const config = {
   },
   minio: {
     endpoint: process.env.MINIO_ENDPOINT ?? 'http://localhost:9000',
+    publicEndpoint: process.env.MINIO_PUBLIC_ENDPOINT ?? 'http://localhost:9000',
     region: process.env.MINIO_REGION ?? 'us-east-1',
     accessKeyId: process.env.MINIO_ROOT_USER ?? 'imageword',
     secretAccessKey: process.env.MINIO_ROOT_PASSWORD ?? 'imageword_minio_dev',
