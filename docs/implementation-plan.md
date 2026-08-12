@@ -70,6 +70,16 @@ Trạng thái: `CHỜ DUYỆT`.
 - Kiểm tra security headers, CORS, rate limit và secret handling.
 - Hoàn thiện README chạy local và production notes.
 
+## Tính năng mở rộng sau Mốc 6 — Video chữ màu
+
+Trạng thái: `HOÀN THÀNH` ngày 2026-08-13 trên nhánh `feature-animated-text-video`.
+
+- Sinh video MP4/H.264 thật bằng FFmpeg và lưu MinIO private.
+- Hiệu ứng ký tự xuất hiện từ trái sang phải, từ trên xuống dưới.
+- Frontend cấu hình thời lượng và phát video tự động, tắt tiếng, lặp liên tục trong gallery.
+- Tái sử dụng bảng `images`, ownership, presigned URL và cascade delete hiện có.
+- Mốc 7 hardening vẫn là mốc kế tiếp; tính năng này không được xem là hoàn thành Mốc 7.
+
 ## Cách xác nhận
 
 Phản hồi theo mẫu: `Xác nhận Mốc 1` hoặc nêu thay đổi cần sửa trong thiết kế. Sau mỗi mốc, hệ thống sẽ báo file đã thay đổi, kết quả kiểm thử và xin duyệt mốc kế tiếp.

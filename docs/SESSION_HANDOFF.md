@@ -1,6 +1,6 @@
 # ImageWord — Session handoff
 
-Cập nhật lần cuối: 2026-08-12 sau khi hoàn thành Mốc 6, múi giờ Asia/Ho_Chi_Minh.
+Cập nhật lần cuối: 2026-08-13 sau khi hoàn thành tính năng video chữ, múi giờ Asia/Ho_Chi_Minh.
 
 ## Cách tiếp tục
 
@@ -16,12 +16,14 @@ Tin nhắn `tiếp tục` tiếp theo chỉ được xem là xác nhận Mốc 7
 
 ## Trạng thái Git tại thời điểm bàn giao
 
-- Nhánh hiện tại: `milestone-6-frontend-workspace`.
+- Nhánh hiện tại: `feature-animated-text-video`.
 - Commit hoàn thành Mốc 4: `b4cee37 feat: complete milestone 4 image storage`.
 - Commit hoàn thành Mốc 5: `abcb98f feat: complete milestone 5 colored text generation`.
+- Commit hoàn thành Mốc 6: `2350359 feat: complete milestone 6 frontend workspace`.
+- Commit code video: `7b54a42 feat: add animated colored text video`.
 - Commit nền của `main` và `dev`: `429b960 init project`.
 - Handoff Mốc 4 được commit riêng ngay sau `b4cee37`.
-- Mốc 6 được commit trên nhánh hiện tại sau commit Mốc 5; working tree được kỳ vọng sạch.
+- Nhánh video kế thừa trực tiếp Mốc 6; working tree được kỳ vọng sạch sau commit tài liệu.
 - Chưa push nhánh lên remote.
 
 Không tự merge vào `dev`/`main` và không push nếu người dùng chưa yêu cầu.
@@ -34,6 +36,7 @@ Không tự merge vào `dev`/`main` và không push nếu người dùng chưa y
 - Mốc 4: upload JPEG/PNG/WebP, MinIO private, metadata, list/detail, presigned URL, ownership và cascade delete.
 - Mốc 5: chuyển ảnh thành PNG chữ màu, vector glyph ổn định, generation lifecycle và rollback.
 - Mốc 6: frontend authentication, upload/generation workspace, private gallery và frontend tests.
+- Tính năng mở rộng: tạo MP4 chữ màu in trái→phải, trên→dưới và phát lặp trên web.
 
 Tài liệu chi tiết:
 
@@ -45,6 +48,7 @@ Tài liệu chi tiết:
 - `docs/milestones/06-frontend-workspace.md`
 - `docs/features/colored-text-generation.md`
 - `docs/features/frontend-workspace.md`
+- `docs/features/animated-text-video.md`
 
 ## Trạng thái hệ thống gần nhất
 
@@ -66,12 +70,13 @@ npm run lint                    PASS
 npm run typecheck               PASS
 npm run build                   PASS
 npm run format:check            PASS
-all backend tests               11/11 PASS
-all frontend tests              2/2 PASS
+all backend tests               14/14 PASS
+all frontend tests              3/3 PASS
 production backend build        PASS
 production Sharp runtime        PASS
 production generator runtime    PASS, deterministic PNG
 API E2E full user flow           PASS
+real MP4 generation via FFmpeg   PASS
 ```
 
 Lệnh integration test:
@@ -115,6 +120,8 @@ Phạm vi dự kiến:
 - `backend/src/images/colored-text.generator.ts`
 - `backend/src/images/generation.service.ts`
 - `backend/src/images/generation.integration.test.ts`
+- `backend/src/images/animated-text-video.generator.ts`
+- `backend/src/images/video-generation.service.ts`
 - `backend/src/auth/auth.middleware.ts`
 - `backend/src/config.ts`
 - `backend/migrations/001_initial_schema.sql`
@@ -139,5 +146,8 @@ Phạm vi dự kiến:
 - Upload mặc định tối đa 10 MB và 40 triệu pixel.
 - Sharp đã được cài và xác minh trong production image Alpine.
 - Roboto Mono được đóng gói và chuyển thành vector path bằng OpenType; không phụ thuộc Fontconfig.
+- Backend Docker dev/prod cài FFmpeg để encode H.264/MP4; chạy ngoài Docker cần `ffmpeg` trong PATH.
+- Video dùng record GENERATED với `mime_type=video/mp4`; frontend nhận diện media qua MIME và dùng `<video autoplay loop muted playsInline controls>`.
+- Video mặc định giới hạn 120 cột, 12.000 glyph, 20 FPS và giữ frame cuối 1 giây.
 - Delete cây ảnh hiện xóa object MinIO trước, sau đó cascade metadata trong transaction PostgreSQL. Nếu mở rộng cơ chế retry/reconciliation, phải ghi rõ trong docs.
 - Không dừng/xóa Docker volumes khi tiếp tục; dữ liệu PostgreSQL/Redis/MinIO nằm trong named volumes.

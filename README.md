@@ -1,6 +1,6 @@
 # ImageWord
 
-Ứng dụng chuyển ảnh thành ảnh chữ màu, sử dụng Express, React/Vite, PostgreSQL, Redis và MinIO.
+Ứng dụng chuyển ảnh thành ảnh chữ màu hoặc video chữ in tuần tự, sử dụng Express, React/Vite, PostgreSQL, Redis, MinIO và FFmpeg.
 
 ## Yêu cầu
 
@@ -36,6 +36,7 @@ GET    /api/v1/images/:id      metadata thuộc user hiện tại
 GET    /api/v1/images/:id/url  presigned download/preview URL
 DELETE /api/v1/images/:id      xóa ảnh và các kết quả liên quan
 POST   /api/v1/images/:id/generate  sinh PNG chữ màu từ ảnh upload
+POST   /api/v1/images/:id/generate-video  sinh MP4 chữ xuất hiện tuần tự
 ```
 
 Tất cả endpoint ảnh yêu cầu `Authorization: Bearer <access-token>`.
@@ -52,6 +53,20 @@ Ví dụ sinh ảnh chữ màu:
 ```
 
 Roboto Mono được đóng gói dưới dependency `@fontsource/roboto-mono` và chuyển thành vector glyph bằng OpenType, giúp kết quả không phụ thuộc font cài trên host/container.
+
+Ví dụ sinh video chữ màu:
+
+```json
+{
+  "columns": 80,
+  "characterSet": "@%#*+=-:. ",
+  "fontFamily": "monospace",
+  "backgroundColor": "#000000",
+  "durationSeconds": 5
+}
+```
+
+Docker image backend đã cài FFmpeg. Nếu chạy backend trực tiếp ngoài Docker, cần có lệnh `ffmpeg` trong `PATH` hoặc đặt `FFMPEG_PATH`.
 
 ## Kiểm tra source code
 
