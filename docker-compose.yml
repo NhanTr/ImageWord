@@ -1,0 +1,163 @@
+name: imageword
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-imageword}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-imageword_postgres_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-imageword}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4-alpine
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-imageword_redis_dev}
+    command:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--requirepass',
+        '${REDIS_PASSWORD:-imageword_redis_dev}',
+      ]
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli -a $$REDIS_PASSWORD ping | grep PONG']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-imageword}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-imageword_minio_dev}
+    command: server /data --console-address ":9001"
+    ports:
+      - '${MINIO_API_PORT:-9000}:9000'
+      - '${MINIO_CONSOLE_PORT:-9001}:9001'
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-imageword}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-imageword_minio_dev}
+      MINIO_BUCKET: ${MINIO_BUCKET:-imageword}
+    entrypoint: >-
+      /bin/sh -c "
+      until mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; do
+        echo 'Waiting for MinIO DNS and API...';
+        sleep 2;
+      done;
+      mc mb --ignore-existing local/$$MINIO_BUCKET &&
+      mc anonymous set none local/$$MINIO_BUCKET
+      "
+    restart: 'no'
+
+  migrate:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: development
+    command: ['npm', 'run', 'migrate', '--workspace', '@imageword/backend']
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-imageword}:${POSTGRES_PASSWORD:-imageword_postgres_dev}@postgres:5432/${POSTGRES_DB:-imageword}
+    volumes:
+      - ./backend:/app/backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: development
+    environment:
+      NODE_ENV: development
+      BACKEND_PORT: 3000
+      FRONTEND_ORIGIN: http://localhost:${FRONTEND_PORT:-5173}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-imageword}:${POSTGRES_PASSWORD:-imageword_postgres_dev}@postgres:5432/${POSTGRES_DB:-imageword}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-imageword_redis_dev}@redis:6379
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-imageword}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-imageword_minio_dev}
+      MINIO_BUCKET: ${MINIO_BUCKET:-imageword}
+      MINIO_FORCE_PATH_STYLE: 'true'
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-imageword-access-development-secret}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-imageword-refresh-development-secret}
+      JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-15m}
+      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL:-7d}
+    ports:
+      - '${BACKEND_PORT:-3000}:3000'
+    volumes:
+      - ./backend:/app/backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:3000/api/v1/health/live').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      target: development
+    environment:
+      VITE_API_BASE_URL: /api/v1
+      VITE_API_PROXY_TARGET: http://backend:3000
+    ports:
+      - '${FRONTEND_PORT:-5173}:5173'
+    volumes:
+      - ./frontend:/app/frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
