@@ -12,7 +12,7 @@
     "dev:frontend": "npm run dev --workspace @imageword/frontend",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "lint": "eslint backend/src frontend/src frontend/vite.config.ts",
+    "lint": "eslint backend/src frontend/src frontend/vite.config.ts frontend/vitest.config.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

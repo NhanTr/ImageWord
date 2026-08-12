@@ -1,46 +1,63 @@
 import { useEffect, useState } from 'react';
 
-type ApiState = 'checking' | 'ready' | 'unavailable';
+import { api, errorMessage } from './api';
+import { AuthScreen } from './components/AuthScreen';
+import { Workspace } from './components/Workspace';
+import type { User } from './types';
+
+type SessionState =
+  { status: 'loading' } | { status: 'guest' } | { status: 'authenticated'; user: User };
 
 export function App() {
-  const [apiState, setApiState] = useState<ApiState>('checking');
+  const [session, setSession] = useState<SessionState>({ status: 'loading' });
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
-
-    fetch(`${baseUrl}/health/ready`, { signal: controller.signal })
-      .then((response) => {
-        setApiState(response.ok ? 'ready' : 'unavailable');
+    let active = true;
+    api
+      .refresh()
+      .then((result) => {
+        if (active) setSession({ status: 'authenticated', user: result.user });
       })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-        setApiState('unavailable');
+      .catch(() => {
+        if (active) setSession({ status: 'guest' });
       });
-
-    return () => controller.abort();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const statusText = {
-    checking: 'Đang kiểm tra các dịch vụ…',
-    ready: 'Backend, PostgreSQL, Redis và MinIO đã sẵn sàng.',
-    unavailable: 'Một hoặc nhiều dịch vụ chưa sẵn sàng.',
-  }[apiState];
+  async function logout() {
+    try {
+      await api.logout();
+    } catch (error) {
+      setNotice(errorMessage(error));
+    } finally {
+      setSession({ status: 'guest' });
+    }
+  }
+
+  if (session.status === 'loading') {
+    return (
+      <main className="loading-screen">
+        <div className="brand-mark" aria-hidden="true">
+          IW
+        </div>
+        <p>Đang khôi phục phiên làm việc…</p>
+      </main>
+    );
+  }
+
+  if (session.status === 'guest') {
+    return <AuthScreen onAuthenticated={(user) => setSession({ status: 'authenticated', user })} />;
+  }
 
   return (
-    <main className="shell">
-      <section className="card">
-        <p className="eyebrow">IMAGEWORD</p>
-        <h1>Biến từng pixel thành ký tự có màu.</h1>
-        <p className="description">
-          Nền tảng dự án đã được khởi tạo. Đăng nhập, upload và chuyển đổi ảnh sẽ được bổ sung ở các
-          mốc tiếp theo.
-        </p>
-        <div className={`status status--${apiState}`}>
-          <span aria-hidden="true" />
-          {statusText}
-        </div>
-      </section>
-    </main>
+    <Workspace
+      user={session.user}
+      notice={notice}
+      onDismissNotice={() => setNotice(null)}
+      onLogout={() => void logout()}
+    />
   );
 }
