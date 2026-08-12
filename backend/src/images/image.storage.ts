@@ -28,6 +28,12 @@ export async function putImageObject(input: {
   );
 }
 
+export async function getImageObject(bucket: string, objectKey: string): Promise<Buffer> {
+  const result = await objectStorage.send(new GetObjectCommand({ Bucket: bucket, Key: objectKey }));
+  if (!result.Body) throw new Error('MinIO returned an empty object body.');
+  return Buffer.from(await result.Body.transformToByteArray());
+}
+
 export async function deleteImageObject(bucket: string, objectKey: string): Promise<void> {
   await objectStorage.send(new DeleteObjectCommand({ Bucket: bucket, Key: objectKey }));
 }

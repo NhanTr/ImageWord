@@ -2,7 +2,8 @@ import { Router } from 'express';
 
 import { requireAuth } from '../auth/auth.middleware.js';
 import { AppError } from '../errors.js';
-import { imageIdSchema, imageListQuerySchema } from './image.schemas.js';
+import { generateImage } from './generation.service.js';
+import { generateImageSchema, imageIdSchema, imageListQuerySchema } from './image.schemas.js';
 import {
   decodeImageCursor,
   deleteImage,
@@ -38,6 +39,13 @@ imageRouter.get('/', async (request, response) => {
       ...(query.cursor ? { cursor: decodeImageCursor(query.cursor) } : {}),
     }),
   );
+});
+
+imageRouter.post('/:id/generate', async (request, response) => {
+  const userId = authenticatedUserId(request.auth?.userId);
+  const imageId = imageIdSchema.parse(request.params.id);
+  const settings = generateImageSchema.parse(request.body);
+  response.status(201).json({ image: await generateImage(userId, imageId, settings) });
 });
 
 imageRouter.get('/:id', async (request, response) => {
