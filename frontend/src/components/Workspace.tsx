@@ -216,8 +216,7 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
           <span>IW</span> IMAGEWORD
         </a>
         <nav aria-label="Điều hướng chính">
-          <a href="#create">Tải ảnh</a>
-          <a href="#generator">Tạo tác phẩm</a>
+          <a href="#create">Tạo mới</a>
           <a href="#gallery">Thư viện</a>
         </nav>
         <div className="account-menu">
@@ -236,41 +235,14 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
 
       <main id="top">
         <section className="workspace-hero">
-          <div className="hero-copy">
-            <p className="eyebrow">IMAGE → COLORED TEXT</p>
-            <h1>
-              Biến ảnh thành
-              <br />
-              <em>những con chữ.</em>
-            </h1>
-            <p>Mỗi ký tự mang màu của chính pixel nó đại diện. Chỉ cần một bức ảnh để bắt đầu.</p>
-            <a className="hero-action" href="#create">
-              Bắt đầu sáng tạo <span aria-hidden="true">↓</span>
-            </a>
-          </div>
-          <div className="hero-art" aria-hidden="true">
-            <span>IMAGEWORD</span>
-            <pre>{'@#%*+=-:.\n+#%@*=-:.\n.:=+*%@#'}</pre>
-          </div>
+          <p className="eyebrow">IMAGE → COLORED TEXT</p>
+          <h1>
+            Biến ảnh thành
+            <br />
+            <em>những con chữ.</em>
+          </h1>
+          <p>Mỗi ký tự mang màu của chính pixel nó đại diện. Chọn một bức ảnh để bắt đầu.</p>
         </section>
-
-        <nav className="workflow-nav" aria-label="Quy trình tạo tác phẩm">
-          <a href="#create">
-            <span>01</span>
-            <strong>Tải ảnh</strong>
-            <small>JPEG, PNG, WebP</small>
-          </a>
-          <a href="#generator">
-            <span>02</span>
-            <strong>Tùy chỉnh</strong>
-            <small>Kiểu chữ và mật độ</small>
-          </a>
-          <a href="#gallery">
-            <span>03</span>
-            <strong>Nhận kết quả</strong>
-            <small>Ảnh PNG hoặc video MP4</small>
-          </a>
-        </nav>
 
         {(notice || message) && (
           <div
@@ -377,7 +349,7 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
                   />
                   <div>
                     <span>ĐANG CHỌN</span>
-                    <strong>{selectedSource.originalName ?? 'Ảnh nguồn'}</strong>
+                    <strong>{selectedSource.originalName}</strong>
                   </div>
                 </div>
                 <form onSubmit={(event) => void generate(event)}>
@@ -385,7 +357,6 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
                     <button
                       type="button"
                       className={outputMode === 'image' ? 'is-active' : ''}
-                      aria-pressed={outputMode === 'image'}
                       onClick={() => setOutputMode('image')}
                     >
                       Ảnh PNG
@@ -393,7 +364,6 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
                     <button
                       type="button"
                       className={outputMode === 'video' ? 'is-active' : ''}
-                      aria-pressed={outputMode === 'video'}
                       onClick={() => {
                         setOutputMode('video');
                         setColumns((value) => Math.min(value, 120));
@@ -499,10 +469,7 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
           <div className="gallery-heading">
             <div>
               <p className="kicker">BỘ SƯU TẬP CỦA BẠN</p>
-              <div className="gallery-title-row">
-                <h2>Thư viện</h2>
-                {!loading && <span>{images.length} mục</span>}
-              </div>
+              <h2>Thư viện</h2>
             </div>
             <div className="filter-tabs" role="group" aria-label="Lọc thư viện">
               {(
@@ -516,7 +483,6 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
                   key={value}
                   className={filter === value ? 'is-active' : ''}
                   type="button"
-                  aria-pressed={filter === value}
                   onClick={() => setFilter(value)}
                 >
                   {label}
