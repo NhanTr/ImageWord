@@ -28,3 +28,10 @@ export const generateImageSchema = z.object({
 });
 
 export type GenerateImageInput = z.infer<typeof generateImageSchema>;
+
+export const generateVideoSchema = generateImageSchema.extend({
+  columns: z.number().int().min(20).max(120).default(80),
+  durationSeconds: z.number().min(2).max(10).default(5),
+});
+
+export type GenerateVideoInput = z.infer<typeof generateVideoSchema>;

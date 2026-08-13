@@ -9,7 +9,7 @@ import {
 } from 'react';
 
 import { api, errorMessage } from '../api';
-import type { GenerateSettings, ImageItem, ImageKind, User } from '../types';
+import type { GenerateSettings, GenerateVideoSettings, ImageItem, ImageKind, User } from '../types';
 import { ImageCard } from './ImageCard';
 import { ImagePreview } from './ImagePreview';
 
@@ -37,7 +37,9 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
   const [selectedSource, setSelectedSource] = useState<ImageItem | null>(null);
   const [uploading, setUploading] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [outputMode, setOutputMode] = useState<'image' | 'video'>('image');
   const [columns, setColumns] = useState(120);
+  const [durationSeconds, setDurationSeconds] = useState(5);
   const [characterSet, setCharacterSet] = useState('@%#*+=-:. ');
   const [backgroundColor, setBackgroundColor] = useState('#000000');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -138,10 +140,21 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
     setBusyId(selectedSource.id);
     setMessage(null);
     try {
-      await api.generateImage(selectedSource.id, settings);
+      if (outputMode === 'video') {
+        const videoSettings: GenerateVideoSettings = { ...settings, durationSeconds };
+        await api.generateVideo(selectedSource.id, videoSettings);
+      } else {
+        await api.generateImage(selectedSource.id, settings);
+      }
       setFilter('ALL');
       await loadImages(undefined, 'ALL');
-      setMessage({ tone: 'success', text: 'Ảnh chữ đã sẵn sàng trong thư viện.' });
+      setMessage({
+        tone: 'success',
+        text:
+          outputMode === 'video'
+            ? 'Video chữ đã sẵn sàng và sẽ tự lặp trong thư viện.'
+            : 'Ảnh chữ đã sẵn sàng trong thư viện.',
+      });
       document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (generationError) {
       setMessage({ tone: 'error', text: errorMessage(generationError) });
@@ -160,8 +173,8 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
   async function removeImage(image: ImageItem) {
     const detail =
       image.kind === 'UPLOADED'
-        ? 'Xóa ảnh gốc cũng sẽ xóa tất cả ảnh chữ được tạo từ ảnh này. Bạn có chắc không?'
-        : 'Bạn có chắc muốn xóa ảnh chữ này?';
+        ? 'Xóa ảnh gốc cũng sẽ xóa tất cả ảnh và video chữ được tạo từ ảnh này. Bạn có chắc không?'
+        : `Bạn có chắc muốn xóa ${image.mimeType.startsWith('video/') ? 'video chữ' : 'ảnh chữ'} này?`;
     if (!window.confirm(detail)) return;
 
     setBusyId(image.id);
@@ -319,10 +332,10 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
           <div className="section-copy">
             <span className="step-number">02</span>
             <p className="kicker">CẤU HÌNH</p>
-            <h2>Tạo ảnh chữ</h2>
+            <h2>Tạo ảnh hoặc video chữ</h2>
             <p>
               {selectedSource
-                ? 'Tinh chỉnh mật độ ký tự và màu nền.'
+                ? 'Chọn ảnh tĩnh hoặc video in chữ tuần tự.'
                 : 'Tải lên hoặc chọn một ảnh gốc trong thư viện.'}
             </p>
           </div>
@@ -340,6 +353,39 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
                   </div>
                 </div>
                 <form onSubmit={(event) => void generate(event)}>
+                  <div className="output-tabs" role="group" aria-label="Loại kết quả">
+                    <button
+                      type="button"
+                      className={outputMode === 'image' ? 'is-active' : ''}
+                      onClick={() => setOutputMode('image')}
+                    >
+                      Ảnh PNG
+                    </button>
+                    <button
+                      type="button"
+                      className={outputMode === 'video' ? 'is-active' : ''}
+                      onClick={() => {
+                        setOutputMode('video');
+                        setColumns((value) => Math.min(value, 120));
+                      }}
+                    >
+                      Video MP4
+                    </button>
+                  </div>
+                  {outputMode === 'video' && (
+                    <div className="effect-note">
+                      <span className="effect-scan" aria-hidden="true">
+                        A<br />
+                        BC
+                        <br />
+                        DEF
+                      </span>
+                      <p>
+                        <strong>Hiệu ứng in tuần tự</strong>Từ trái sang phải, từ trên xuống dưới và
+                        tự lặp trên web.
+                      </p>
+                    </div>
+                  )}
                   <label className="range-label">
                     <span>
                       Mật độ cột <output>{columns}</output>
@@ -347,13 +393,30 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
                     <input
                       type="range"
                       min="20"
-                      max="300"
+                      max={outputMode === 'video' ? 120 : 300}
                       value={columns}
                       onChange={(event) => setColumns(Number(event.target.value))}
                     />
                     <small>Ít chi tiết</small>
                     <small>Nhiều chi tiết</small>
                   </label>
+                  {outputMode === 'video' && (
+                    <label className="range-label">
+                      <span>
+                        Thời gian in chữ <output>{durationSeconds} giây</output>
+                      </span>
+                      <input
+                        type="range"
+                        min="2"
+                        max="10"
+                        step="0.5"
+                        value={durationSeconds}
+                        onChange={(event) => setDurationSeconds(Number(event.target.value))}
+                      />
+                      <small>Nhanh</small>
+                      <small>Chậm</small>
+                    </label>
+                  )}
                   <label>
                     Bộ ký tự
                     <input
@@ -382,7 +445,13 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
                     type="submit"
                     disabled={generating}
                   >
-                    {generating ? 'Đang biến đổi ảnh…' : 'Tạo ảnh chữ'}{' '}
+                    {generating
+                      ? outputMode === 'video'
+                        ? 'Đang dựng video…'
+                        : 'Đang biến đổi ảnh…'
+                      : outputMode === 'video'
+                        ? 'Tạo video chữ'
+                        : 'Tạo ảnh chữ'}{' '}
                     <span aria-hidden="true">✦</span>
                   </button>
                 </form>
@@ -407,7 +476,7 @@ export function Workspace({ user, notice, onDismissNotice, onLogout }: Workspace
                 [
                   ['ALL', 'Tất cả'],
                   ['UPLOADED', 'Ảnh gốc'],
-                  ['GENERATED', 'Ảnh chữ'],
+                  ['GENERATED', 'Kết quả'],
                 ] as const
               ).map(([value, label]) => (
                 <button

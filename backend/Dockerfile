@@ -7,6 +7,7 @@ RUN npm ci
 
 FROM dependencies AS development
 ENV NODE_ENV=development
+RUN apk add --no-cache ffmpeg
 COPY tsconfig.base.json eslint.config.js .prettierrc.json ./
 COPY backend backend
 EXPOSE 3000
@@ -27,6 +28,7 @@ RUN npm ci --omit=dev
 FROM node:22-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
+RUN apk add --no-cache ffmpeg
 COPY --from=production-dependencies /app/node_modules node_modules
 COPY --from=builder /app/backend/dist backend/dist
 COPY backend/migrations backend/migrations
