@@ -79,7 +79,7 @@ export function escapeXml(value: string): string {
     .replaceAll("'", '&apos;');
 }
 
-export function parseHexColor(value: string): { r: number; g: number; b: number } {
+function parseHexColor(value: string): { r: number; g: number; b: number } {
   return {
     r: Number.parseInt(value.slice(1, 3), 16),
     g: Number.parseInt(value.slice(3, 5), 16),

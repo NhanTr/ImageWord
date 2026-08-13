@@ -80,11 +80,4 @@ export const config = {
     cellWidth: 8,
     cellHeight: 16,
   },
-  video: {
-    ffmpegPath: process.env.FFMPEG_PATH ?? 'ffmpeg',
-    fps: readInteger(process.env.VIDEO_FPS, 20),
-    maxColumns: readInteger(process.env.VIDEO_MAX_COLUMNS, 120),
-    maxGlyphs: readInteger(process.env.VIDEO_MAX_GLYPHS, 12_000),
-    holdSeconds: readInteger(process.env.VIDEO_HOLD_SECONDS, 1),
-  },
 } as const;

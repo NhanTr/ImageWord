@@ -92,7 +92,6 @@ export async function insertGeneratedImage(input: {
   parentImageId: string;
   objectKey: string;
   bucket: string;
-  mimeType: string;
   settings: Record<string, unknown>;
 }): Promise<ImageRecord> {
   const result = await database.query<ImageRow>(
@@ -101,7 +100,7 @@ export async function insertGeneratedImage(input: {
         id, user_id, parent_image_id, kind, status, object_key, bucket,
         mime_type, size_bytes, settings
       )
-      SELECT $1, $2, parent.id, 'GENERATED', 'PENDING', $4, $5, $6, 0, $7::jsonb
+      SELECT $1, $2, parent.id, 'GENERATED', 'PENDING', $4, $5, 'image/png', 0, $6::jsonb
       FROM images parent
       WHERE parent.id = $3
         AND parent.user_id = $2
@@ -109,15 +108,7 @@ export async function insertGeneratedImage(input: {
         AND parent.status = 'READY'
       RETURNING ${imageColumns}
     `,
-    [
-      input.id,
-      input.userId,
-      input.parentImageId,
-      input.objectKey,
-      input.bucket,
-      input.mimeType,
-      input.settings,
-    ],
+    [input.id, input.userId, input.parentImageId, input.objectKey, input.bucket, input.settings],
   );
 
   const row = result.rows[0];
