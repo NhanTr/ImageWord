@@ -89,12 +89,7 @@ export function ImageCard({
         </div>
         <div className="card-actions">
           {image.kind === 'UPLOADED' && image.status === 'READY' && (
-            <button
-              className="card-primary-action"
-              type="button"
-              onClick={() => onSelect(image)}
-              disabled={busy}
-            >
+            <button type="button" onClick={() => onSelect(image)} disabled={busy}>
               Tạo chữ
             </button>
           )}
