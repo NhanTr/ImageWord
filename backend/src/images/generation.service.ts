@@ -44,7 +44,6 @@ export async function generateImage(
     parentImageId: sourceImage.id,
     objectKey,
     bucket,
-    mimeType: 'image/png',
     settings: storedSettings,
   });
 

@@ -32,17 +32,14 @@ export function ImageCard({
       anchor.href = result.url;
       anchor.target = '_blank';
       anchor.rel = 'noreferrer';
-      anchor.download =
-        image.originalName ??
-        `imageword-${image.id}.${image.mimeType === 'video/mp4' ? 'mp4' : 'png'}`;
+      anchor.download = image.originalName ?? `imageword-${image.id}.png`;
       anchor.click();
     } catch (downloadError) {
       onError(errorMessage(downloadError));
     }
   }
 
-  const isVideo = image.mimeType.startsWith('video/');
-  const imageLabel = image.kind === 'UPLOADED' ? 'Ảnh gốc' : isVideo ? 'Video chữ' : 'Ảnh chữ';
+  const imageLabel = image.kind === 'UPLOADED' ? 'Ảnh gốc' : 'Ảnh chữ';
   const createdAt = new Intl.DateTimeFormat('vi-VN', {
     day: '2-digit',
     month: '2-digit',
@@ -53,21 +50,13 @@ export function ImageCard({
     <article className="image-card">
       <div className="image-frame">
         {image.status === 'READY' ? (
-          <ImagePreview
-            imageId={image.id}
-            alt={image.originalName ?? imageLabel}
-            mimeType={image.mimeType}
-          />
+          <ImagePreview imageId={image.id} alt={image.originalName ?? imageLabel} />
         ) : (
           <div className={`preview-placeholder status-${image.status.toLowerCase()}`}>
             {image.status === 'FAILED' ? 'Tạo ảnh thất bại' : 'Đang xử lý…'}
           </div>
         )}
-        <span
-          className={`kind-badge kind-${image.kind.toLowerCase()} ${isVideo ? 'kind-video' : ''}`}
-        >
-          {imageLabel}
-        </span>
+        <span className={`kind-badge kind-${image.kind.toLowerCase()}`}>{imageLabel}</span>
       </div>
       <div className="image-card-body">
         <div>
