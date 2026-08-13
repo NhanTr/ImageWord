@@ -97,3 +97,5 @@ Frontend production mặc định ở http://localhost:8080. PostgreSQL, Redis, 
 - Database: `docs/02-database-design.md`
 - Kế hoạch có xác nhận: `docs/implementation-plan.md`
 - Từng tính năng: `docs/features/`
+
+- test pull
