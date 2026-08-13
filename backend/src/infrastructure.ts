@@ -27,6 +27,16 @@ export const objectStorage = new S3Client({
   },
 });
 
+export const publicObjectStorage = new S3Client({
+  endpoint: config.minio.publicEndpoint,
+  region: config.minio.region,
+  forcePathStyle: config.minio.forcePathStyle,
+  credentials: {
+    accessKeyId: config.minio.accessKeyId,
+    secretAccessKey: config.minio.secretAccessKey,
+  },
+});
+
 export async function connectInfrastructure(): Promise<void> {
   await database.query('SELECT 1');
 
@@ -48,4 +58,5 @@ export async function checkInfrastructure(): Promise<void> {
 export async function closeInfrastructure(): Promise<void> {
   await Promise.allSettled([database.end(), redis.isOpen ? redis.quit() : Promise.resolve()]);
   objectStorage.destroy();
+  publicObjectStorage.destroy();
 }

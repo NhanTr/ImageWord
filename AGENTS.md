@@ -31,6 +31,14 @@ Xây dựng ứng dụng web cho phép người dùng đăng ký, đăng nhập,
 - Khi hoàn thành một tính năng, cập nhật file tương ứng trong `docs/features/` với trạng thái, API thực tế, quyết định và cách kiểm thử.
 - Nếu implementation khác tài liệu, cập nhật tài liệu trong cùng thay đổi.
 
+## Tiếp tục sau khi tạm dừng
+
+- Khi người dùng nhắn `tiếp tục`, phải đọc toàn bộ `docs/SESSION_HANDOFF.md` trước khi thực hiện thay đổi.
+- Đối chiếu nhánh/commit và working tree thực tế với handoff; không reset hoặc ghi đè thay đổi mới của người dùng.
+- Không làm lại các mốc đã hoàn thành.
+- Tin nhắn `tiếp tục` được xem là xác nhận bắt đầu mốc kế tiếp được ghi trong handoff.
+- Sau khi hoàn thành mốc kế tiếp, cập nhật lại handoff hoặc thay thế bằng trạng thái mới.
+
 ## Chuẩn triển khai
 
 - Dùng TypeScript strict mode cho frontend và backend.

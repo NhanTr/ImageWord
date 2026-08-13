@@ -7,7 +7,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 import { config } from '../config.js';
-import { objectStorage } from '../infrastructure.js';
+import { objectStorage, publicObjectStorage } from '../infrastructure.js';
 
 export async function putImageObject(input: {
   bucket: string;
@@ -35,7 +35,12 @@ export async function deleteImageObject(bucket: string, objectKey: string): Prom
 export async function deleteImageObjects(
   objects: Array<{ bucket: string; objectKey: string }>,
 ): Promise<void> {
-  const byBucket = Map.groupBy(objects, (object) => object.bucket);
+  const byBucket = new Map<string, Array<{ bucket: string; objectKey: string }>>();
+  for (const object of objects) {
+    const bucketObjects = byBucket.get(object.bucket) ?? [];
+    bucketObjects.push(object);
+    byBucket.set(object.bucket, bucketObjects);
+  }
 
   for (const [bucket, bucketObjects] of byBucket) {
     for (let start = 0; start < bucketObjects.length; start += 1_000) {
@@ -55,7 +60,11 @@ export async function deleteImageObjects(
 }
 
 export async function createImageDownloadUrl(bucket: string, objectKey: string): Promise<string> {
-  return getSignedUrl(objectStorage, new GetObjectCommand({ Bucket: bucket, Key: objectKey }), {
-    expiresIn: config.minio.presignedUrlTtlSeconds,
-  });
+  return getSignedUrl(
+    publicObjectStorage,
+    new GetObjectCommand({ Bucket: bucket, Key: objectKey }),
+    {
+      expiresIn: config.minio.presignedUrlTtlSeconds,
+    },
+  );
 }
