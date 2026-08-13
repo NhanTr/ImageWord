@@ -73,4 +73,11 @@ export const config = {
     maxBytes: readInteger(process.env.UPLOAD_MAX_BYTES, 10 * 1024 * 1024),
     maxPixels: readInteger(process.env.UPLOAD_MAX_PIXELS, 40_000_000),
   },
+  generation: {
+    minColumns: 20,
+    maxColumns: 300,
+    maxGlyphs: readInteger(process.env.GENERATION_MAX_GLYPHS, 50_000),
+    cellWidth: 8,
+    cellHeight: 16,
+  },
 } as const;

@@ -21,6 +21,8 @@ Truy cập:
 - Backend readiness: http://localhost:3000/api/v1/health/ready
 - MinIO Console: http://localhost:9001
 
+Frontend cung cấp đầy đủ đăng ký/đăng nhập, upload, cấu hình tạo ảnh chữ, preview và thư viện riêng theo tài khoản. Refresh token được giữ trong HttpOnly cookie; frontend không lưu JWT vào localStorage.
+
 Muốn thay đổi credential hoặc port, sao chép `.env.example` thành `.env` và thay giá trị trước khi chạy.
 
 Nếu hostname/public port của MinIO khác `http://localhost:9000`, đặt `MINIO_PUBLIC_ENDPOINT` thành URL mà trình duyệt người dùng truy cập được. Backend dùng giá trị này để tạo presigned URL.
@@ -33,9 +35,23 @@ GET    /api/v1/images          cursor pagination và filter
 GET    /api/v1/images/:id      metadata thuộc user hiện tại
 GET    /api/v1/images/:id/url  presigned download/preview URL
 DELETE /api/v1/images/:id      xóa ảnh và các kết quả liên quan
+POST   /api/v1/images/:id/generate  sinh PNG chữ màu từ ảnh upload
 ```
 
 Tất cả endpoint ảnh yêu cầu `Authorization: Bearer <access-token>`.
+
+Ví dụ sinh ảnh chữ màu:
+
+```json
+{
+  "columns": 120,
+  "characterSet": "@%#*+=-:. ",
+  "fontFamily": "monospace",
+  "backgroundColor": "#000000"
+}
+```
+
+Roboto Mono được đóng gói dưới dependency `@fontsource/roboto-mono` và chuyển thành vector glyph bằng OpenType, giúp kết quả không phụ thuộc font cài trên host/container.
 
 ## Kiểm tra source code
 
@@ -46,6 +62,7 @@ npm run typecheck
 npm run build
 npm run format:check
 npm test --workspace @imageword/backend
+npm test --workspace @imageword/frontend
 ```
 
 Integration test cần PostgreSQL và Redis đang chạy. Có thể chạy đúng môi trường Compose bằng:

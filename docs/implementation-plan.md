@@ -35,7 +35,7 @@ Trạng thái: `HOÀN THÀNH` — người dùng xác nhận ngày 2026-08-12.
 
 ## Mốc 4 — Upload và quản lý file MinIO
 
-Trạng thái: `HOÀN THÀNH` — chờ người dùng nghiệm thu để chuyển sang Mốc 5.
+Trạng thái: `HOÀN THÀNH` — người dùng xác nhận tiếp tục ngày 2026-08-12.
 
 - Upload có validation kích thước, MIME và magic bytes.
 - Lưu object private trong MinIO và metadata PostgreSQL.
@@ -44,7 +44,7 @@ Trạng thái: `HOÀN THÀNH` — chờ người dùng nghiệm thu để chuy�
 
 ## Mốc 5 — Bộ xử lý ảnh thành chữ màu
 
-Trạng thái: `CHỜ DUYỆT`.
+Trạng thái: `HOÀN THÀNH` — người dùng xác nhận ngày 2026-08-12.
 
 - Resize/lấy mẫu ảnh theo số cột.
 - Ánh xạ luminance sang character ramp.
@@ -54,7 +54,7 @@ Trạng thái: `CHỜ DUYỆT`.
 
 ## Mốc 6 — Frontend Vite
 
-Trạng thái: `CHỜ DUYỆT`.
+Trạng thái: `HOÀN THÀNH` — chờ người dùng nghiệm thu để chuyển sang Mốc 7.
 
 - Trang đăng ký/đăng nhập.
 - Trang upload và lựa chọn thông số sinh ảnh.

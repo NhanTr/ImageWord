@@ -86,6 +86,70 @@ export async function insertUploadedImage(input: {
   return mapImage(row);
 }
 
+export async function insertGeneratedImage(input: {
+  id: string;
+  userId: string;
+  parentImageId: string;
+  objectKey: string;
+  bucket: string;
+  settings: Record<string, unknown>;
+}): Promise<ImageRecord> {
+  const result = await database.query<ImageRow>(
+    `
+      INSERT INTO images (
+        id, user_id, parent_image_id, kind, status, object_key, bucket,
+        mime_type, size_bytes, settings
+      )
+      SELECT $1, $2, parent.id, 'GENERATED', 'PENDING', $4, $5, 'image/png', 0, $6::jsonb
+      FROM images parent
+      WHERE parent.id = $3
+        AND parent.user_id = $2
+        AND parent.kind = 'UPLOADED'
+        AND parent.status = 'READY'
+      RETURNING ${imageColumns}
+    `,
+    [input.id, input.userId, input.parentImageId, input.objectKey, input.bucket, input.settings],
+  );
+
+  const row = result.rows[0];
+  if (!row) throw new Error('Source image changed before generation could start.');
+  return mapImage(row);
+}
+
+export async function markGeneratedImageReady(input: {
+  id: string;
+  userId: string;
+  sizeBytes: number;
+  width: number;
+  height: number;
+}): Promise<ImageRecord | null> {
+  const result = await database.query<ImageRow>(
+    `
+      UPDATE images
+      SET status = 'READY', size_bytes = $3, width = $4, height = $5, error_message = NULL
+      WHERE id = $1 AND user_id = $2 AND kind = 'GENERATED' AND status = 'PENDING'
+      RETURNING ${imageColumns}
+    `,
+    [input.id, input.userId, input.sizeBytes, input.width, input.height],
+  );
+  return result.rows[0] ? mapImage(result.rows[0]) : null;
+}
+
+export async function markGeneratedImageFailed(
+  id: string,
+  userId: string,
+  errorMessage: string,
+): Promise<void> {
+  await database.query(
+    `
+      UPDATE images
+      SET status = 'FAILED', error_message = $3, size_bytes = 0, width = NULL, height = NULL
+      WHERE id = $1 AND user_id = $2 AND kind = 'GENERATED' AND status <> 'READY'
+    `,
+    [id, userId, errorMessage.slice(0, 500)],
+  );
+}
+
 export async function findOwnedImage(imageId: string, userId: string): Promise<ImageRecord | null> {
   const result = await database.query<ImageRow>(
     `SELECT ${imageColumns} FROM images WHERE id = $1 AND user_id = $2 LIMIT 1`,

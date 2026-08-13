@@ -1,6 +1,6 @@
 # ImageWord — Session handoff
 
-Cập nhật lần cuối: 2026-08-12, múi giờ Asia/Ho_Chi_Minh.
+Cập nhật lần cuối: 2026-08-12 sau khi hoàn thành Mốc 6, múi giờ Asia/Ho_Chi_Minh.
 
 ## Cách tiếp tục
 
@@ -10,16 +10,18 @@ Khi người dùng nhắn `tiếp tục`:
 2. Chạy `git status --short --branch` và `git log --oneline --decorate -3`.
 3. Giữ nguyên mọi thay đổi mới của người dùng nếu working tree không sạch.
 4. Kiểm tra stack bằng `docker compose ps -a`; chạy `docker compose up --build -d` nếu cần.
-5. Bắt đầu Mốc 5 — bộ xử lý ảnh thành chữ màu. Không làm lại Mốc 1–4.
+5. Nếu người dùng đã nghiệm thu Mốc 6, bắt đầu Mốc 7 — hoàn thiện và kiểm thử end-to-end. Không làm lại Mốc 1–6.
 
-Tin nhắn `tiếp tục` của người dùng được xem là xác nhận bắt đầu Mốc 5.
+Tin nhắn `tiếp tục` tiếp theo chỉ được xem là xác nhận Mốc 7 sau khi Mốc 6 đã được bàn giao cho người dùng.
 
 ## Trạng thái Git tại thời điểm bàn giao
 
-- Nhánh hiện tại: `milestone-4-image-storage`.
+- Nhánh hiện tại: `milestone-6-frontend-workspace`.
 - Commit hoàn thành Mốc 4: `b4cee37 feat: complete milestone 4 image storage`.
+- Commit hoàn thành Mốc 5: `abcb98f feat: complete milestone 5 colored text generation`.
 - Commit nền của `main` và `dev`: `429b960 init project`.
-- Handoff được commit riêng ngay sau `b4cee37`; working tree được kỳ vọng sạch khi tạm dừng.
+- Handoff Mốc 4 được commit riêng ngay sau `b4cee37`.
+- Mốc 6 được commit trên nhánh hiện tại sau commit Mốc 5; working tree được kỳ vọng sạch.
 - Chưa push nhánh lên remote.
 
 Không tự merge vào `dev`/`main` và không push nếu người dùng chưa yêu cầu.
@@ -30,6 +32,8 @@ Không tự merge vào `dev`/`main` và không push nếu người dùng chưa y
 - Mốc 2: npm monorepo, Express/Vite, Dockerfile dev/prod và Docker Compose.
 - Mốc 3: PostgreSQL migration, register/login/refresh/logout/me, JWT và Redis session.
 - Mốc 4: upload JPEG/PNG/WebP, MinIO private, metadata, list/detail, presigned URL, ownership và cascade delete.
+- Mốc 5: chuyển ảnh thành PNG chữ màu, vector glyph ổn định, generation lifecycle và rollback.
+- Mốc 6: frontend authentication, upload/generation workspace, private gallery và frontend tests.
 
 Tài liệu chi tiết:
 
@@ -37,7 +41,10 @@ Tài liệu chi tiết:
 - `docs/milestones/02-foundation-and-docker.md`
 - `docs/milestones/03-database-and-authentication.md`
 - `docs/milestones/04-image-upload-and-storage.md`
+- `docs/milestones/05-colored-text-generation.md`
+- `docs/milestones/06-frontend-workspace.md`
 - `docs/features/colored-text-generation.md`
+- `docs/features/frontend-workspace.md`
 
 ## Trạng thái hệ thống gần nhất
 
@@ -59,9 +66,12 @@ npm run lint                    PASS
 npm run typecheck               PASS
 npm run build                   PASS
 npm run format:check            PASS
-auth + image integration tests  4/4 PASS
+all backend tests               11/11 PASS
+all frontend tests              2/2 PASS
 production backend build        PASS
 production Sharp runtime        PASS
+production generator runtime    PASS, deterministic PNG
+API E2E full user flow           PASS
 ```
 
 Lệnh integration test:
@@ -70,42 +80,18 @@ Lệnh integration test:
 docker compose exec -T backend npm test --workspace @imageword/backend
 ```
 
-## Mốc tiếp theo — Mốc 5
+## Mốc tiếp theo — Mốc 7
 
-Mục tiêu: chuyển một ảnh UPLOADED thuộc user hiện tại thành PNG được cấu thành từ các ký tự có màu lấy từ vùng pixel tương ứng.
+Mục tiêu: hardening, kiểm thử end-to-end và hoàn thiện hướng dẫn vận hành.
 
-API dự kiến:
+Phạm vi dự kiến:
 
-```text
-POST /api/v1/images/:id/generate
-```
-
-Payload đã thiết kế:
-
-```json
-{
-  "columns": 120,
-  "characterSet": "@%#*+=-:. ",
-  "fontFamily": "monospace",
-  "backgroundColor": "#000000"
-}
-```
-
-Phạm vi cần triển khai:
-
-1. Validate image id, ownership, `kind=UPLOADED`, `status=READY` và generation settings.
-2. Đọc ảnh nguồn private từ MinIO; normalize EXIF orientation.
-3. Giới hạn `columns` 20–300 và tổng glyph/khối lượng xử lý.
-4. Tính số hàng theo tỷ lệ ảnh và aspect ratio của glyph monospace.
-5. Resize/lấy mẫu ảnh; tính luminance để ánh xạ character ramp.
-6. Lấy RGB trung bình của cell để tô từng ký tự.
-7. Escape mọi text/settings khi render SVG; font MVP chỉ dùng allowlist an toàn.
-8. Chuyển SVG thành PNG bằng Sharp.
-9. Lưu object ở `users/{userId}/generated/{imageId}/colored-text.png`.
-10. Tạo record `GENERATED` liên kết `parent_image_id` và lưu settings.
-11. Rollback object/metadata phù hợp khi MinIO hoặc PostgreSQL lỗi.
-12. Viết unit test thuật toán và integration test ownership, object lifecycle, metadata liên kết và delete cascade.
-13. Cập nhật `docs/features/colored-text-generation.md`, tạo báo cáo Mốc 5 và xin duyệt Mốc 6.
+1. Chạy browser E2E thực tế cho đăng ký/đăng nhập, refresh, upload, generation, download và delete.
+2. Kiểm tra responsive/interaction UI khi browser runtime khả dụng; đây là phần chưa chạy được ở Mốc 6 vì không có browser kết nối.
+3. Test phân quyền chéo user, upload lỗi và trạng thái failure qua full HTTP stack.
+4. Kiểm tra restart container không mất dữ liệu PostgreSQL/MinIO.
+5. Rà soát security headers, CORS, rate limit, secret handling và production compose.
+6. Hoàn thiện README local/production và checklist triển khai.
 
 ## Quyết định cần giữ
 
@@ -126,9 +112,25 @@ Phạm vi cần triển khai:
 - `backend/src/images/image.storage.ts`
 - `backend/src/images/image.types.ts`
 - `backend/src/images/image.integration.test.ts`
+- `backend/src/images/colored-text.generator.ts`
+- `backend/src/images/generation.service.ts`
+- `backend/src/images/generation.integration.test.ts`
 - `backend/src/auth/auth.middleware.ts`
 - `backend/src/config.ts`
 - `backend/migrations/001_initial_schema.sql`
+
+## Các file frontend quan trọng
+
+- `frontend/src/App.tsx`
+- `frontend/src/api.ts`
+- `frontend/src/types.ts`
+- `frontend/src/components/AuthScreen.tsx`
+- `frontend/src/components/Workspace.tsx`
+- `frontend/src/components/ImageCard.tsx`
+- `frontend/src/components/ImagePreview.tsx`
+- `frontend/src/styles.css`
+- `frontend/src/api.test.ts`
+- `frontend/src/App.test.tsx`
 
 ## Lưu ý kỹ thuật
 
@@ -136,5 +138,6 @@ Phạm vi cần triển khai:
 - Presigned URL dùng `MINIO_PUBLIC_ENDPOINT=http://localhost:9000` cho trình duyệt.
 - Upload mặc định tối đa 10 MB và 40 triệu pixel.
 - Sharp đã được cài và xác minh trong production image Alpine.
+- Roboto Mono được đóng gói và chuyển thành vector path bằng OpenType; không phụ thuộc Fontconfig.
 - Delete cây ảnh hiện xóa object MinIO trước, sau đó cascade metadata trong transaction PostgreSQL. Nếu mở rộng cơ chế retry/reconciliation, phải ghi rõ trong docs.
 - Không dừng/xóa Docker volumes khi tiếp tục; dữ liệu PostgreSQL/Redis/MinIO nằm trong named volumes.
