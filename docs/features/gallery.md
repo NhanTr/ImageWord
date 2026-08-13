@@ -24,6 +24,8 @@ Trạng thái: `HOÀN THÀNH MỐC 6`
 - Card kết quả cho phép tải/mở file qua URL có thời hạn.
 - Xóa ảnh gốc yêu cầu xác nhận riêng và cảnh báo rõ về cascade kết quả.
 - Có loading, empty, failed và lỗi kết nối ở cả gallery lẫn từng preview.
+- Lưới card tự đổi số cột theo không gian khả dụng; card có phân cấp nội dung và vùng hành động lớn hơn.
+- Bộ lọc có trạng thái `aria-pressed`, tiêu đề hiển thị số mục đang có trong trang kết quả hiện tại.
 
 ## Kiểm thử
 
