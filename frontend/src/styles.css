@@ -937,3 +937,461 @@ footer p {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Readability refresh */
+:root {
+  --ink: #f7f8f4;
+  --muted: #aeb5aa;
+  --line: rgb(255 255 255 / 14%);
+  --panel: #171b16;
+  --panel-raised: #1d221c;
+  --acid: #caff70;
+  --blue: #8bb2ff;
+  --danger: #ff978c;
+}
+
+body {
+  color: var(--ink);
+  background: #0d100d;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--acid);
+  outline-offset: 3px;
+}
+
+.app-shell {
+  background: radial-gradient(circle at 90% 5%, rgb(139 178 255 / 8%), transparent 25rem), #0d100d;
+}
+
+.app-header {
+  min-height: 76px;
+  padding-inline: clamp(20px, 4vw, 64px);
+  background: rgb(13 16 13 / 92%);
+}
+
+.app-header nav {
+  gap: 8px;
+}
+
+.app-header nav a,
+.account-menu button {
+  padding: 9px 12px;
+  border-radius: 7px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+
+.app-header nav a:hover,
+.account-menu button:hover {
+  color: var(--ink);
+  background: rgb(255 255 255 / 7%);
+}
+
+.workspace-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  align-items: center;
+  gap: clamp(40px, 8vw, 120px);
+  min-height: 560px;
+  padding: clamp(64px, 8vw, 108px) clamp(22px, 7vw, 108px);
+  background:
+    linear-gradient(90deg, transparent 0 70%, rgb(202 255 112 / 3%)),
+    radial-gradient(circle at 78% 45%, rgb(139 178 255 / 14%), transparent 26rem);
+}
+
+.hero-copy {
+  max-width: 850px;
+}
+
+.workspace-hero h1 {
+  max-width: 850px;
+  margin-top: 18px;
+  font-size: clamp(52px, 6vw, 88px);
+  line-height: 0.98;
+}
+
+.hero-copy > p:last-of-type {
+  max-width: 590px;
+  margin: 26px 0 0;
+  color: var(--muted);
+  font-size: clamp(16px, 1.5vw, 19px);
+  line-height: 1.7;
+}
+
+.hero-action {
+  width: fit-content;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  margin-top: 32px;
+  padding: 0 18px;
+  border: 1px solid rgb(202 255 112 / 48%);
+  border-radius: 8px;
+  color: var(--acid);
+  font-size: 13px;
+  font-weight: 700;
+  transition:
+    color 0.2s,
+    background 0.2s,
+    transform 0.2s;
+}
+
+.hero-action:hover {
+  color: #0d100d;
+  background: var(--acid);
+  transform: translateY(-2px);
+}
+
+.hero-art {
+  position: relative;
+  aspect-ratio: 1;
+  display: grid;
+  place-content: center;
+  overflow: hidden;
+  border: 1px solid rgb(202 255 112 / 22%);
+  border-radius: 20px;
+  background:
+    linear-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 3%) 1px, transparent 1px), #121612;
+  background-size: 24px 24px;
+  box-shadow: 0 30px 80px rgb(0 0 0 / 30%);
+  transform: rotate(2deg);
+}
+
+.hero-art::after {
+  content: '';
+  position: absolute;
+  inset: 12%;
+  border: 1px solid rgb(139 178 255 / 30%);
+  border-radius: 50%;
+}
+
+.hero-art span {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  color: var(--muted);
+  font:
+    500 9px 'DM Mono',
+    monospace;
+  letter-spacing: 0.18em;
+}
+
+.hero-art pre {
+  z-index: 1;
+  margin: 0;
+  color: var(--acid);
+  font:
+    700 clamp(23px, 3vw, 40px)/1.25 'DM Mono',
+    monospace;
+  letter-spacing: 0.08em;
+  text-shadow: 18px 14px 0 rgb(139 178 255 / 22%);
+}
+
+.workflow-nav {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 0 clamp(22px, 7vw, 108px);
+  border-bottom: 1px solid var(--line);
+  background: #111410;
+}
+
+.workflow-nav a {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 14px;
+  padding: 24px clamp(14px, 2.5vw, 34px);
+  border-left: 1px solid var(--line);
+  transition: background 0.2s;
+}
+
+.workflow-nav a:last-child {
+  border-right: 1px solid var(--line);
+}
+
+.workflow-nav a:hover {
+  background: rgb(202 255 112 / 5%);
+}
+
+.workflow-nav span {
+  grid-row: 1 / 3;
+  align-self: center;
+  color: var(--acid);
+  font:
+    500 11px 'DM Mono',
+    monospace;
+}
+
+.workflow-nav strong {
+  font-size: 14px;
+}
+
+.workflow-nav small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.creator-grid,
+.generator-section {
+  grid-template-columns: minmax(210px, 280px) minmax(0, 920px);
+  justify-content: space-between;
+  gap: clamp(40px, 7vw, 100px);
+  padding: clamp(74px, 8vw, 112px) clamp(22px, 7vw, 108px);
+  scroll-margin-top: 70px;
+}
+
+.section-copy h2,
+.gallery-heading h2 {
+  font-size: clamp(38px, 4vw, 58px);
+  line-height: 1.05;
+}
+
+.section-copy > p:last-child {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.step-number {
+  position: static;
+  width: fit-content;
+  display: block;
+  margin-bottom: 24px;
+  padding: 6px 9px;
+  border: 1px solid rgb(202 255 112 / 28%);
+  border-radius: 99px;
+  color: var(--acid);
+  background: rgb(202 255 112 / 5%);
+}
+
+.drop-zone {
+  min-height: 350px;
+  border-color: rgb(255 255 255 / 24%);
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
+}
+
+.drop-zone:hover {
+  border-color: rgb(202 255 112 / 62%);
+  background: #1a1f19;
+}
+
+.drop-zone h3 {
+  font-size: 22px;
+}
+
+.primary-button,
+.secondary-button,
+.load-more {
+  border-radius: 8px;
+}
+
+.file-selection {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.generator-section {
+  background: #121511;
+}
+
+.generator-section.is-disabled {
+  opacity: 1;
+}
+
+.generator-section.is-disabled .generator-card {
+  border-style: dashed;
+}
+
+.generator-card {
+  min-height: 430px;
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: 0 22px 60px rgb(0 0 0 / 18%);
+}
+
+.generator-card form {
+  padding: clamp(26px, 4vw, 48px);
+}
+
+.output-tabs,
+.filter-tabs {
+  border-radius: 9px;
+  background: #111410;
+}
+
+.output-tabs button,
+.filter-tabs button {
+  border-radius: 6px;
+}
+
+.effect-note,
+input:not([type='range']):not([type='color']),
+.color-field > span {
+  border-radius: 8px;
+}
+
+.gallery-section {
+  padding: clamp(74px, 8vw, 112px) clamp(22px, 5vw, 76px);
+  scroll-margin-top: 70px;
+}
+
+.gallery-heading {
+  margin-bottom: 36px;
+}
+
+.gallery-title-row {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+}
+
+.gallery-title-row > span {
+  margin-bottom: 7px;
+  padding: 5px 8px;
+  border-radius: 99px;
+  color: var(--muted);
+  background: rgb(255 255 255 / 7%);
+  font-size: 10px;
+}
+
+.image-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.image-card {
+  border-radius: 13px;
+  background: var(--panel);
+  box-shadow: 0 14px 34px rgb(0 0 0 / 16%);
+}
+
+.image-card:hover {
+  transform: translateY(-4px);
+  border-color: rgb(202 255 112 / 42%);
+  box-shadow: 0 18px 44px rgb(0 0 0 / 24%);
+}
+
+.image-card-body {
+  padding: 19px;
+}
+
+.image-card-body h3 {
+  font-size: 15px;
+}
+
+.image-card-body p,
+.relation-note,
+.error-note {
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.card-actions {
+  gap: 8px;
+  margin-top: 17px;
+  padding-top: 15px;
+}
+
+.card-actions button {
+  min-height: 34px;
+  padding: 7px 11px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.card-actions .card-primary-action {
+  border-color: var(--acid);
+  color: #0d100d;
+  background: var(--acid);
+  font-weight: 700;
+}
+
+.card-actions .card-primary-action:hover {
+  color: #0d100d;
+  background: #dcffa0;
+}
+
+.gallery-state {
+  min-height: 280px;
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+@media (max-width: 1000px) {
+  .workspace-hero {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    min-height: 500px;
+  }
+
+  .app-header nav {
+    display: none;
+  }
+
+  .creator-grid,
+  .generator-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-header {
+    min-height: 66px;
+  }
+
+  .workspace-hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding-block: 70px;
+  }
+
+  .workspace-hero h1 {
+    font-size: clamp(44px, 13vw, 58px);
+  }
+
+  .hero-art {
+    display: none;
+  }
+
+  .workflow-nav {
+    grid-template-columns: 1fr;
+    padding-inline: 22px;
+  }
+
+  .workflow-nav a,
+  .workflow-nav a:last-child {
+    border-right: 1px solid var(--line);
+  }
+
+  .workflow-nav a + a {
+    border-top: 0;
+  }
+
+  .creator-grid,
+  .generator-section,
+  .gallery-section {
+    padding-block: 72px;
+  }
+
+  .gallery-title-row {
+    align-items: center;
+  }
+
+  .filter-tabs {
+    width: 100%;
+  }
+
+  .filter-tabs button {
+    flex: 1;
+  }
+}
