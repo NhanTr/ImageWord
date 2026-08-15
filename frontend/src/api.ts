@@ -1,4 +1,4 @@
-import type { AuthResult, GenerateSettings, GenerateVideoSettings, ImageItem } from './types';
+import type { AuthResult, GenerateSettings, ImageItem } from './types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
 
@@ -145,13 +145,6 @@ export const api = {
     });
   },
 
-  generateVideo(imageId: string, settings: GenerateVideoSettings) {
-    return request<{ image: ImageItem }>(`/images/${imageId}/generate-video`, {
-      method: 'POST',
-      body: JSON.stringify(settings),
-    });
-  },
-
   getImageUrl(imageId: string) {
     return request<{ url: string; expiresIn: number }>(`/images/${imageId}/url`);
   },
@@ -173,8 +166,6 @@ export function errorMessage(error: unknown): string {
       INVALID_IMAGE: 'Ảnh không hợp lệ hoặc có kích thước pixel quá lớn.',
       GENERATION_TOO_COMPLEX: 'Mật độ ký tự quá lớn cho bức ảnh này.',
       IMAGE_GENERATION_FAILED: 'Không thể tạo ảnh chữ. Vui lòng thử lại.',
-      VIDEO_GENERATION_TOO_COMPLEX: 'Mật độ ký tự quá lớn để tạo video.',
-      VIDEO_GENERATION_FAILED: 'Không thể tạo video. Vui lòng thử lại.',
     };
     return translations[error.code] ?? error.message;
   }

@@ -38,7 +38,3 @@ export interface GenerateSettings {
   fontFamily: 'monospace';
   backgroundColor: string;
 }
-
-export interface GenerateVideoSettings extends GenerateSettings {
-  durationSeconds: number;
-}
